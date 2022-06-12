@@ -4,3 +4,4 @@ build
 HELP.md
 settings.gradle
 todoapp.iml
+.talismanrc
