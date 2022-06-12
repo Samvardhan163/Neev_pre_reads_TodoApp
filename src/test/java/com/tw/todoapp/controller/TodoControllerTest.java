@@ -15,6 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
@@ -47,7 +49,7 @@ public class TodoControllerTest {
                 .perform(post("/api/todo")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(todo)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"))
                 .andExpect(header().string("Location", "http://localhost/api/todo/1"));
 
@@ -55,4 +57,6 @@ public class TodoControllerTest {
         assertThat(todoArgumentCaptor.getValue().isCompleted(), is(false));
 
     }
+
+
 }
