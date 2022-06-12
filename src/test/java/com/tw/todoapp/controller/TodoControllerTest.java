@@ -65,18 +65,30 @@ public class TodoControllerTest {
         Todo todo = new Todo(1L, "playing", false);
         Todo todo1 = new Todo(2L, "Reading", false);
 
-        when(todoService.getAllTodoTask()).thenReturn(List.of(todo,todo1));
+        when(todoService.getAllTodoTask()).thenReturn(List.of(todo, todo1));
 
         this.mockMvc
                 .perform(get("/api/todo"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$",hasSize(2)))
-                .andExpect(jsonPath("$[0].id",is(1)))
-                .andExpect(jsonPath("$[0].description",is("playing")))
-                .andExpect(jsonPath("$[0].completed",is(false)));
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].id", is(1)))
+                .andExpect(jsonPath("$[0].description", is("playing")))
+                .andExpect(jsonPath("$[0].completed", is(false)));
 
 
     }
 
+    @Test
+    void shouldReturnTodoTaskWhenTheirIdIsPassed() throws Exception {
+        Todo todo = new Todo(1L, "playing", false);
+
+        when(todoService.getTodoTaskById(1L)).thenReturn(todo);
+
+        this.mockMvc
+                .perform(get("/api/todo/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.description", is("playing")));
+    }
 }

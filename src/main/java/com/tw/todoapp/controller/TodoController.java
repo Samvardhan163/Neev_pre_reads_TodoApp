@@ -22,18 +22,22 @@ public class TodoController {
     @PostMapping
     public ResponseEntity<Todo> createTodoTask(@RequestBody Todo todolist, UriComponentsBuilder uriComponentsBuilder) {
         Todo todoTask = todoService.createTodoTask(todolist);
-        UriComponents uriComponents =uriComponentsBuilder.path("/api/todo/{id}").buildAndExpand(todolist.getId());
+        UriComponents uriComponents = uriComponentsBuilder.path("/api/todo/{id}").buildAndExpand(todolist.getId());
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(uriComponents.toUri());
 
-        return new ResponseEntity<>(todolist,headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(todolist, headers, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public  ResponseEntity<List<Todo>> getAllTodoTask()
-    {
+    public ResponseEntity<List<Todo>> getAllTodoTask() {
         HttpHeaders responseHeaders = new HttpHeaders();
-        return new ResponseEntity<>(todoService.getAllTodoTask(), responseHeaders,HttpStatus.OK);
+        return new ResponseEntity<>(todoService.getAllTodoTask(), responseHeaders, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Todo> getTodoTaskById(@PathVariable(name = "id") Long id) {
+        return new ResponseEntity<>(todoService.getTodoTaskById(id), HttpStatus.OK);
     }
 
 }
