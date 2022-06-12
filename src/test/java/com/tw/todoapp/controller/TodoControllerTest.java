@@ -3,6 +3,7 @@ package com.tw.todoapp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tw.todoapp.entity.Todo;
+import com.tw.todoapp.exception.TodoTaskNotFoundException;
 import com.tw.todoapp.service.TodoService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -90,5 +91,17 @@ public class TodoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$.description", is("playing")));
+    }
+
+    @Test
+    void shouldReturn404WhenIdIsNotFound() throws Exception {
+        Todo todo = new Todo(1L, "playing", false);
+
+        when(todoService.getTodoTaskById(1L)).thenThrow(new TodoTaskNotFoundException("Todo task with id  '1' not found"));
+
+        this.mockMvc
+                .perform(get("/api/todo/1"))
+                .andExpect(status().isNotFound());
+
     }
 }
