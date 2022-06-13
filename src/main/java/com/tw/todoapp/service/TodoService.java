@@ -44,4 +44,14 @@ public class TodoService {
         oldTodo.setCompleted(updateTodo.isCompleted());
         return oldTodo;
     }
+
+    public Todo deleteTodoTaskById(long id) {
+        Optional<Todo> todo = todoRepository.findById(id);
+        if (todo.isEmpty()) {
+            throw new TodoTaskNotFoundException(String.format("Todo task with id: '%s' not found", id));
+        }
+        Todo deletedTodo = todo.get();
+        todoRepository.deleteById(id);
+        return (deletedTodo);
+    }
 }

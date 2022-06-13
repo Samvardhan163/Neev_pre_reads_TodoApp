@@ -15,9 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-
 import java.util.List;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -57,7 +55,6 @@ public class TodoControllerTest {
 
         assertThat(todoArgumentCaptor.getValue().getDescription(), is("Playing"));
         assertThat(todoArgumentCaptor.getValue().isCompleted(), is(false));
-
     }
 
 
@@ -76,8 +73,6 @@ public class TodoControllerTest {
                 .andExpect(jsonPath("$[0].id", is(1)))
                 .andExpect(jsonPath("$[0].description", is("playing")))
                 .andExpect(jsonPath("$[0].completed", is(false)));
-
-
     }
 
     @Test
@@ -102,7 +97,6 @@ public class TodoControllerTest {
         this.mockMvc
                 .perform(get("/api/todo/1"))
                 .andExpect(status().isNotFound());
-
     }
 
     @Test
@@ -123,5 +117,17 @@ public class TodoControllerTest {
         assertThat(todoArgumentCaptor.getValue().getDescription(), is(todo.getDescription()));
         assertThat(todoArgumentCaptor.getValue().isCompleted(), is(todo.isCompleted()));
 
+    }
+
+    @Test
+    void shouldDeleteATodoTaskWithTheirId() throws Exception {
+        Todo todo = new Todo(1L, "sleeping", false);
+        when(todoService.deleteTodoTaskById(1L)).thenReturn(todo);
+
+        this.mockMvc
+                .perform(delete("/api/todo/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description", is("sleeping")))
+                .andExpect(jsonPath("$.completed", is(false)));
     }
 }
