@@ -5,11 +5,9 @@ import com.tw.todoapp.exception.TodoTaskNotFoundException;
 import com.tw.todoapp.repository.TodoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TodoService {
@@ -34,5 +32,16 @@ public class TodoService {
             throw new TodoTaskNotFoundException(String.format("Todo task with id: '%s' not found", id));
         }
         return todoRepository.findById(id).get();
+    }
+
+    public Todo updateTodoTaskById(Long id, Todo updateTodo) {
+        Optional<Todo> todo = todoRepository.findById(id);
+        if (todo.isEmpty()) {
+            throw new TodoTaskNotFoundException(String.format("Todo task with id: '%s' not found", id));
+        }
+        Todo oldTodo = todo.get();
+        oldTodo.setDescription(updateTodo.getDescription());
+        oldTodo.setCompleted(updateTodo.isCompleted());
+        return oldTodo;
     }
 }

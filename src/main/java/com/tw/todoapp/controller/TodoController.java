@@ -40,4 +40,9 @@ public class TodoController {
         return new ResponseEntity<>(todoService.getTodoTaskById(id), HttpStatus.OK);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Todo> updateTodoTaskById(@PathVariable(name = "id") Long id, @RequestBody Todo todo) {
+        Todo newTodo = todoService.updateTodoTaskById(id, todo);
+        return new ResponseEntity<>(newTodo, HttpStatus.OK);
+    }
 }

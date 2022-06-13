@@ -22,6 +22,4 @@ public class Todo {
     @Column(nullable = false)
     private boolean completed;
 
-
-
 }

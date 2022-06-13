@@ -21,9 +21,9 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TodoController.class)
@@ -102,6 +102,26 @@ public class TodoControllerTest {
         this.mockMvc
                 .perform(get("/api/todo/1"))
                 .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    void shouldUpdateTheTodoTaskWhenTheirIdIsPassed() throws Exception {
+        Todo todo = new Todo(1L, "playing", false);
+        Todo newTodo = new Todo(1L, "sleeping", true);
+        when(todoService.updateTodoTaskById(eq(1L), todoArgumentCaptor.capture())).thenReturn(newTodo);
+
+        this.mockMvc
+                .perform(put("/api/todo/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(todo)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.description", is("sleeping")))
+                .andExpect(jsonPath("$.completed", is(true)));
+
+        assertThat(todoArgumentCaptor.getValue().getDescription(), is(todo.getDescription()));
+        assertThat(todoArgumentCaptor.getValue().isCompleted(), is(todo.isCompleted()));
 
     }
 }
