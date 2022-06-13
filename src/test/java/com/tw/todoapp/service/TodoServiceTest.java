@@ -15,6 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -74,5 +75,19 @@ public class TodoServiceTest {
         assertEquals(updatedTodo.getId(),newTodo.getId());
         assertEquals(updatedTodo.isCompleted(),newTodo.isCompleted());
         assertEquals(updatedTodo.getDescription(),newTodo.getDescription());
+    }
+
+    @Test
+    void shouldReturnTodoTaskByDeletingTodoTaskByItsId()
+    {
+        Todo todo = new Todo(1L, "playing", false);
+        Mockito.when(todoRepository.findById(1L)).thenReturn(Optional.of(todo));
+
+        Todo deletedTodo=todoService.deleteTodoTaskById(todo.getId());
+
+        verify(todoRepository).deleteById(todo.getId());
+        assertEquals(deletedTodo.getDescription(),todo.getDescription());
+        assertEquals(deletedTodo.isCompleted(),todo.isCompleted());
+        assertEquals(deletedTodo.getId(),todo.getId());
     }
 }
