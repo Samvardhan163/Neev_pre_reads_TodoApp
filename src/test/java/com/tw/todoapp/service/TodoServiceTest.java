@@ -6,12 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -38,15 +39,26 @@ public class TodoServiceTest {
     @Test
     void shouldReturnTwoTodoTask() {
         Todo todo = new Todo(1L, "playing", false);
-        Todo todo1=new Todo(2L,"sleeping",false);
-        List<Todo>todoList=new ArrayList<>();
+        Todo todo1 = new Todo(2L, "sleeping", false);
+        List<Todo> todoList = new ArrayList<>();
         todoList.add(todo);
         todoList.add(todo1);
         when(todoService.getAllTodoTask()).thenReturn(todoList);
 
-       List<Todo> fetchTodoList=todoService.getAllTodoTask();
+        List<Todo> fetchTodoList = todoService.getAllTodoTask();
 
-       assertThat(fetchTodoList.size()).isGreaterThan(0);
+        assertThat(fetchTodoList.size()).isGreaterThan(0);
     }
+
+    @Test
+    void shouldReturnTodoTaskById() {
+        Todo todo = new Todo(1L, "playing", false);
+        Mockito.when(todoRepository.findById(1L)).thenReturn(Optional.of(todo));
+
+        Todo fetchTodo = todoService.getTodoTaskById(1L);
+
+        assertEquals(fetchTodo, todo);
+    }
+
 
 }
