@@ -15,7 +15,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+
 import java.util.List;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -117,6 +119,18 @@ public class TodoControllerTest {
         assertThat(todoArgumentCaptor.getValue().getDescription(), is(todo.getDescription()));
         assertThat(todoArgumentCaptor.getValue().isCompleted(), is(todo.isCompleted()));
 
+    }
+
+    @Test
+    void shouldReturn404WhenUpdateIdIsNotFound() throws Exception {
+        Todo todo = new Todo(1L, "sleeping", false);
+        when(todoService.updateTodoTaskById(eq(2L), todoArgumentCaptor.capture())).thenThrow(new TodoTaskNotFoundException("Todo task with id  '2' not found "));
+
+        this.mockMvc
+                .perform(put("/api/todo/2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(todo)))
+                .andExpect(status().isNotFound());
     }
 
     @Test
