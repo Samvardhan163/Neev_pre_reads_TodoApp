@@ -23,4 +23,8 @@ public class Todo {
     private boolean completed;
 
 
+    public Todo(String description , boolean completed) {
+        this.description=description;
+        this.completed=completed;
+    }
 }
