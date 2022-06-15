@@ -1,6 +1,7 @@
 package com.tw.todoapp.repository;
 
 import com.tw.todoapp.entity.Todo;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -18,7 +19,7 @@ public class TodoRepositoryTest {
 
     @Test
     void shouldSaveNewTodoTask() {
-        Todo todo = new Todo(1L, "playing", false);
+        Todo todo = new Todo( "playing", false);
 
         Todo savedTodo = todoRepository.save(todo);
 
@@ -27,8 +28,8 @@ public class TodoRepositoryTest {
 
     @Test
     void shouldReturnTwoTodoTask() {
-        Todo todo = new Todo(2L, "playing", false);
-        Todo todo1 = new Todo(3L, "sleeping", false);
+        Todo todo = new Todo( "playing", false);
+        Todo todo1 = new Todo("sleeping", false);
         todoRepository.save(todo);
         todoRepository.save(todo1);
 
