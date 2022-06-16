@@ -89,4 +89,71 @@ public class TodoServiceTest {
         assertEquals(deletedTodo.isCompleted(),todo.isCompleted());
         assertEquals(deletedTodo.getId(),todo.getId());
     }
+
+    @Test
+    void AssertingWhetherNewTodoTaskWithPriorityIsCreatedReturnsThatTodoTask() {
+        Todo todo = new Todo(1L, "playing", false,true);
+
+        when(todoService.createTodoTask(any(Todo.class))).thenReturn(todo);
+
+        Todo savedTodo = todoRepository.save(todo);
+
+        assertThat(savedTodo.getDescription()).isNotNull();
+    }
+
+    @Test
+    void shouldReturnTwoTodoTaskWithPriority() {
+        Todo todo = new Todo(1L, "playing", false,true);
+        Todo todo1 = new Todo(2L, "sleeping", false,true );
+        List<Todo> todoList = new ArrayList<>();
+        todoList.add(todo);
+        todoList.add(todo1);
+        when(todoService.getAllTodoTask()).thenReturn(todoList);
+
+        List<Todo> fetchTodoList = todoService.getAllTodoTask();
+
+        assertThat(fetchTodoList.size()).isGreaterThan(0);
+    }
+
+    @Test
+    void shouldReturnTodoTaskWithPriorityById() {
+        Todo todo = new Todo(1L, "playing", false,true);
+        Mockito.when(todoRepository.findById(1L)).thenReturn(Optional.of(todo));
+
+        Todo fetchTodo = todoService.getTodoTaskById(1L);
+
+        assertEquals(fetchTodo.getId(),todo.getId());
+        assertEquals(fetchTodo.isCompleted(),todo.isCompleted());
+        assertEquals(fetchTodo.getDescription(),todo.getDescription());
+        assertEquals(fetchTodo.isPriority(),todo.isPriority());
+    }
+
+    @Test
+    void shouldReturnUpdatedTodoTaskWithPriorityByGettingItsId() {
+        Todo todo = new Todo(1L, "playing", false,true);
+        Todo newTodo=new Todo(1L,"sleeping",false,true);
+        Mockito.when(todoRepository.findById(1L)).thenReturn(Optional.of(todo));
+
+        Todo updatedTodo=todoService.updateTodoTaskById(newTodo.getId(),newTodo);
+
+        assertEquals(updatedTodo.getId(),newTodo.getId());
+        assertEquals(updatedTodo.isCompleted(),newTodo.isCompleted());
+        assertEquals(updatedTodo.getDescription(),newTodo.getDescription());
+        assertEquals(updatedTodo.isPriority(),newTodo.isPriority());
+    }
+
+    @Test
+    void shouldReturnTodoTaskWithPriorityByDeletingTodoTaskByItsId()
+    {
+        Todo todo = new Todo(1L, "playing", false,false);
+        Mockito.when(todoRepository.findById(1L)).thenReturn(Optional.of(todo));
+
+        Todo deletedTodo=todoService.deleteTodoTaskById(todo.getId());
+
+        verify(todoRepository).deleteById(todo.getId());
+        assertEquals(deletedTodo.getDescription(),todo.getDescription());
+        assertEquals(deletedTodo.isCompleted(),todo.isCompleted());
+        assertEquals(deletedTodo.getId(),todo.getId());
+        assertEquals(deletedTodo.isPriority(),todo.isPriority());
+    }
 }
