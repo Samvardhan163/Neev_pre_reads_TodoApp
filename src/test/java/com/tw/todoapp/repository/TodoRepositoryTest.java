@@ -73,4 +73,63 @@ public class TodoRepositoryTest {
 
         assertThat(todoOptional).isEmpty();
     }
+
+    @Test
+    void shouldSaveNewTodoTaskWithPriority() {
+        Todo todo = new Todo( "playing", false,false);
+
+        Todo savedTodo = todoRepository.save(todo);
+
+        assertThat(savedTodo).isNotNull();
+    }
+
+    @Test
+    void shouldReturnTwoTodoTaskWithPriority() {
+        Todo todo = new Todo( "playing", false,true);
+        Todo todo1 = new Todo("sleeping", false,true);
+        todoRepository.save(todo);
+        todoRepository.save(todo1);
+
+        List<Todo> fetchedTodo = (List<Todo>) todoRepository.findAll();
+
+        assertThat(fetchedTodo.size()).isGreaterThan(0);
+    }
+
+    @Test
+    void shouldReturnTodoTaskWithPriorityByItsId() {
+        Todo todo = new Todo("playing", false,false);
+        todoRepository.save(todo);
+
+        Optional<Todo> fetchedTodo = todoRepository.findById(todo.getId());
+
+        assertThat(fetchedTodo.get().getDescription()).isNotNull();
+
+    }
+
+    @Test
+    void shouldReturnTheUpdatedTodoTaskWithPriorityByItsId() {
+        Todo todo = new Todo("playing", false,true);
+        todoRepository.save(todo);
+        Optional<Todo> savedTodo = todoRepository.findById(todo.getId());
+        savedTodo.get().setDescription("sleeping");
+        savedTodo.get().setCompleted(true);
+        savedTodo.get().setPriority(true);
+
+        Todo updatedTodo = todoRepository.save(savedTodo.orElse(todo));
+
+        assertThat(updatedTodo.getDescription()).isEqualTo("sleeping");
+        assertThat(updatedTodo.isCompleted()).isEqualTo(true);
+        assertThat(updatedTodo.isPriority()).isEqualTo(true);
+    }
+
+    @Test
+    void shouldReturnDeletedTodoTaskWithPriority() {
+        Todo todo = new Todo("playing", false,false);
+        todoRepository.save(todo);
+
+        todoRepository.deleteById(todo.getId());
+        Optional<Todo> todoOptional = todoRepository.findById(todo.getId());
+
+        assertThat(todoOptional).isEmpty();
+    }
 }
