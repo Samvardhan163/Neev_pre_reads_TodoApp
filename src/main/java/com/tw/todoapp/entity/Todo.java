@@ -22,9 +22,17 @@ public class Todo {
     @Column(nullable = false)
     private boolean completed;
 
+    @Column(nullable = false)
+    private boolean priority;
 
+    public Todo(Long id,String description , boolean completed) {
+        this.id=id;
+        this.description=description;
+        this.completed=completed;
+    }
     public Todo(String description , boolean completed) {
         this.description=description;
         this.completed=completed;
     }
+
 }
