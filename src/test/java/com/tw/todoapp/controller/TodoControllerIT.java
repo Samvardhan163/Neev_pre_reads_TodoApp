@@ -133,9 +133,93 @@ public class TodoControllerIT {
         todoRepository.save(todo);
 
         this.mockMvc
-                .perform(delete("/api/todo/1"))
+                .perform(delete("/api/todo/"+todo.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description", is("sleeping")))
                 .andExpect(jsonPath("$.completed", is(false)));
+    }
+
+    @Test
+    void shouldAbleCreateNewTodoTaskWithPriority() throws Exception {
+        todo = new Todo("sleeping", false,false);
+        todoRepository.save(todo);
+
+        this.mockMvc
+                .perform(post("/api/todo")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(todo)))
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
+                .andExpect(header().string("Location", "http://localhost/api/todo/"+todo.getId()));
+
+    }
+
+
+    @Test
+    void allTodoTaskEndpointShouldReturnTwoTodoTaskWithPriority() throws Exception {
+        todo = new Todo("sleeping", false,false);
+        Todo todo1 = new Todo( "Reading", false,false);
+
+        List<Todo> todoList = new ArrayList<>();
+        todoList.add(todo);
+        todoList.add(todo1);
+
+        todoRepository.saveAll(todoList);
+
+        this.mockMvc
+                .perform(get("/api/todo"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].id", is(todo.getId().intValue())))
+                .andExpect(jsonPath("$[0].description", is("sleeping")))
+                .andExpect(jsonPath("$[0].completed", is(false)))
+                .andExpect(jsonPath("$[0].priority", is(false)));
+    }
+
+    @Test
+    void shouldReturnTodoTaskWithPriorityWhenTheirIdIsPassed() throws Exception {
+        todo = new Todo("sleeping", false,false);
+        todoRepository.save(todo);
+
+        this.mockMvc
+                .perform(get("/api/todo/{id}",todo.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.description", is("sleeping")));
+    }
+
+    @Test
+    void shouldUpdateTheTodoTaskWithPriorityWhenTheirIdIsPassed() throws Exception {
+        todo = new Todo("sleeping", false,false);
+        Todo newTodo = new Todo( "Reading", true,false);
+
+        todoRepository.save(todo);
+
+
+        this.mockMvc
+                .perform(put("/api/todo/{id}",todo.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newTodo)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(todo.getId().intValue())))
+                .andExpect(jsonPath("$.description", is("Reading")))
+                .andExpect(jsonPath("$.completed", is(true)))
+                .andExpect(jsonPath("$.priority", is(false)));
+
+    }
+
+
+    @Test
+    void shouldDeleteATodoTaskWithPriorityWithTheirId() throws Exception {
+        todo = new Todo("sleeping", false,true);
+        todoRepository.save(todo);
+
+        this.mockMvc
+                .perform(delete("/api/todo/"+todo.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description", is("sleeping")))
+                .andExpect(jsonPath("$.completed", is(false)))
+                .andExpect(jsonPath("$.priority", is(true)));
     }
 }

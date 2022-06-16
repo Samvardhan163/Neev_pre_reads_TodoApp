@@ -25,7 +25,7 @@ public class Todo {
     @Column(nullable = false)
     private boolean priority;
 
-    public Todo(Long id,String description , boolean completed) {
+    public Todo(Long id,String description,boolean completed) {
         this.id=id;
         this.description=description;
         this.completed=completed;
@@ -34,5 +34,11 @@ public class Todo {
         this.description=description;
         this.completed=completed;
     }
+    public Todo(String description , boolean completed,boolean priority) {
+        this.description=description;
+        this.completed=completed;
+        this.priority=priority;
+    }
+
 
 }

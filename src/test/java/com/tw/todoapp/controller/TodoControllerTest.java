@@ -144,4 +144,101 @@ public class TodoControllerTest {
                 .andExpect(jsonPath("$.description", is("sleeping")))
                 .andExpect(jsonPath("$.completed", is(false)));
     }
+
+    @Test
+    void shouldAbleCreateNewTodoTaskWithPriority() throws Exception {
+        Todo todo = new Todo(1L, "Playing", false, true);
+        when(todoService.createTodoTask(todoArgumentCaptor.capture())).thenReturn(todo);
+
+        this.mockMvc
+                .perform(post("/api/todo")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(todo)))
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
+                .andExpect(header().string("Location", "http://localhost/api/todo/1"));
+
+        assertThat(todoArgumentCaptor.getValue().getDescription(), is("Playing"));
+        assertThat(todoArgumentCaptor.getValue().isCompleted(), is(false));
+        assertThat(todoArgumentCaptor.getValue().isPriority(), is(true));
+    }
+
+    @Test
+    void allTodoTaskEndpointShouldReturnTwoTodoTaskWithPriority() throws Exception {
+        Todo todo = new Todo(1L, "playing", false, false);
+        Todo todo1 = new Todo(2L, "Reading", false, false);
+
+        when(todoService.getAllTodoTask()).thenReturn(List.of(todo, todo1));
+
+        this.mockMvc
+                .perform(get("/api/todo"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].id", is(1)))
+                .andExpect(jsonPath("$[0].description", is("playing")))
+                .andExpect(jsonPath("$[0].completed", is(false)))
+                .andExpect(jsonPath("$[0].priority", is(false)));
+    }
+
+    @Test
+    void shouldReturnTodoTaskWithPriorityWhenTheirIdIsPassed() throws Exception {
+        Todo todo = new Todo(1L, "playing", false, true);
+
+        when(todoService.getTodoTaskById(1L)).thenReturn(todo);
+
+        this.mockMvc
+                .perform(get("/api/todo/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.description", is("playing")));
+    }
+
+    @Test
+    void shouldUpdateTheTodoTaskWithPriorityWhenTheirIdIsPassed() throws Exception {
+        Todo todo = new Todo(1L, "playing", false, true);
+        Todo newTodo = new Todo(1L, "sleeping", true, true);
+        when(todoService.updateTodoTaskById(eq(1L), todoArgumentCaptor.capture())).thenReturn(newTodo);
+
+        this.mockMvc
+                .perform(put("/api/todo/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(todo)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.description", is("sleeping")))
+                .andExpect(jsonPath("$.completed", is(true)))
+                .andExpect(jsonPath("$.priority", is(true)));
+
+        assertThat(todoArgumentCaptor.getValue().getDescription(), is(todo.getDescription()));
+        assertThat(todoArgumentCaptor.getValue().isCompleted(), is(todo.isCompleted()));
+        assertThat(todoArgumentCaptor.getValue().isPriority(), is(todo.isPriority()));
+    }
+
+    @Test
+    void shouldReturn404WhenUpdateIdWithPriorityIsNotFound() throws Exception {
+        Todo todo = new Todo(1L, "sleeping", false,false);
+        when(todoService.updateTodoTaskById(eq(2L), todoArgumentCaptor.capture())).thenThrow(new TodoTaskNotFoundException("Todo task with id  '2' not found "));
+
+        this.mockMvc
+                .perform(put("/api/todo/2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(todo)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldDeleteATodoTaskWithPriorityWithTheirId() throws Exception {
+        Todo todo = new Todo(1L, "sleeping", false,true);
+        when(todoService.deleteTodoTaskById(1L)).thenReturn(todo);
+
+        this.mockMvc
+                .perform(delete("/api/todo/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description", is("sleeping")))
+                .andExpect(jsonPath("$.completed", is(false)))
+                .andExpect(jsonPath("$.priority", is(true)));
+    }
+
+
 }
